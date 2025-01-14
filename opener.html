@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open URLs in New Tabs</title>
+</head>
+<body>
+    <textarea id="urlInput" rows="10" cols="50" placeholder="Enter URLs here, one per line"></textarea><br>
+    <button onclick="openUrls()">Open URLs</button>
+
+    <script>
+        function openUrls() {
+            const inputText = document.getElementById('urlInput').value;
+            const urls = inputText.split('\n');
+
+            urls.forEach(url => {
+                url = url.trim();
+                if (url.startsWith('http')) {
+                    window.open(url, '_blank');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
