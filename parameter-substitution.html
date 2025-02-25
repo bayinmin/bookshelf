@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parameter Replacer</title>
+    <script>
+        function replaceParameter() {
+            var paramName = document.getElementById("paramName").value;
+            var paramValue = document.getElementById("paramValue").value;
+            var inputText = document.getElementById("inputText").value;
+
+            // Create a regular expression to find the pattern paramName=value
+            var regex = new RegExp(paramName + "=\\d+");
+            // Replace the existing value with the new value
+            var result = inputText.replace(regex, paramName + "=" + paramValue);
+
+            document.getElementById("outputText").value = result;
+        }
+    </script>
+</head>
+<body>
+    <h1>Parameter Replacer</h1>
+    
+    <label for="paramName">Parameter Name:</label>
+    <input type="text" id="paramName"><br><br>
+    
+    <label for="paramValue">Parameter Value:</label>
+    <input type="text" id="paramValue"><br><br>
+    
+    <label for="inputText">Input Text:</label><br>
+    <textarea id="inputText" rows="10" cols="50"></textarea><br><br>
+    
+    <button onclick="replaceParameter()">Replace</button><br><br>
+    
+    <label for="outputText">Output Text:</label><br>
+    <textarea id="outputText" rows="10" cols="50" readonly></textarea>
+</body>
+</html>
