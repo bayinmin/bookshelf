@@ -5,7 +5,9 @@ def validate_jwks(file_path):
     try:
         with open(file_path, 'r') as f:
             jwks = json.load(f)
-        
+            
+            
+        print("Finding d, p, q entries in the jwks file....")
         for key in jwks.get("keys", []):
             sensitive_fields = ["d", "p", "q"]  # Private key components
             exposed_fields = [field for field in sensitive_fields if field in key]
