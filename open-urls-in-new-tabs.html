@@ -3,16 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Open URLs in New Tabs</title>
+    <title>Combine URLs and Paths</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 20px;
+        }
+        textarea {
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+        }
+        button {
+            background-color: #4CAF50; /* Green */
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            transition-duration: 0.4s;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        button:hover {
+            background-color: white;
+            color: black;
+            border: 2px solid #4CAF50;
+        }
+        .warning-button {
+            background-color: #FFC107; /* Softer Yellowish Warning Color */
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            transition-duration: 0.4s;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .warning-button:hover {
+            background-color: white;
+            color: black;
+            border: 2px solid #FFC107;
+        }
+    </style>
 </head>
 <body>
-    <h1>Open URLs in a new browser tab</h1>
+    <h1>Combine URLs and Paths</h1>
     <ul>
-        <li>Paste URLs in the text fields below. One URLs each line.</li>
-        <li>Click the button and the script will open URLs one by one in each seperate tab</li>
+        <li>Enter URLs and paths line by line in the respective text fields below.</li>
+        <li>Click "Open URLs" to open URLs in separate tabs.</li>
+        <li>Click "Combine URLs and Paths" to generate combined URLs.</li>
+        <li>Click "Clear All" to clear all fields.</li>
     </ul>
-    <textarea id="urlInput" rows="10" cols="50" placeholder="Enter URLs here, one per line"></textarea><br>
+    <textarea id="urlInput" rows="10" placeholder="Enter URLs here, one per line"></textarea>
+    <textarea id="pathInput" rows="10" placeholder="Enter paths here, one per line"></textarea><br>
     <button onclick="openUrls()">Open URLs</button>
+    <button onclick="combineUrlsAndPaths()">Combine URLs and Paths</button>
+    <button class="warning-button" onclick="clearAllFields()">Clear All</button>
 
     <script>
         function openUrls() {
@@ -25,6 +81,38 @@
                     window.open(url, '_blank');
                 }
             });
+        }
+
+        function combineUrlsAndPaths() {
+            const urlInput = document.getElementById('urlInput').value;
+            const pathInput = document.getElementById('pathInput').value;
+
+            const urls = urlInput.split('\n').map(url => url.trim());
+            const paths = pathInput.split('\n').map(path => path.trim());
+
+            const combinedUrls = [];
+
+            urls.forEach(url => {
+                if (url.startsWith('http')) {
+                    paths.forEach(path => {
+                        // Ensure no double slash only between domain and path
+                        if (url.endsWith('/') && path.startsWith('/')) {
+                            combinedUrls.push(`${url.slice(0, -1)}${path}`);
+                        } else if (!url.endsWith('/') && !path.startsWith('/')) {
+                            combinedUrls.push(`${url}/${path}`);
+                        } else {
+                            combinedUrls.push(`${url}${path}`);
+                        }
+                    });
+                }
+            });
+
+            document.getElementById('urlInput').value = combinedUrls.join('\n');
+        }
+
+        function clearAllFields() {
+            document.getElementById('urlInput').value = '';
+            document.getElementById('pathInput').value = '';
         }
     </script>
 </body>
