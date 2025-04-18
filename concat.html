@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Concatenator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 20px;
+        }
+        .file-upload, .domain-input {
+            margin-bottom: 15px;
+        }
+        .buttons {
+            margin-top: 15px;
+        }
+        .buttons button {
+            background-color: #4CAF50; /* Green */
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            transition-duration: 0.4s;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .buttons button:hover {
+            background-color: white;
+            color: black;
+            border: 2px solid #4CAF50;
+        }
+        textarea {
+            width: 100%;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+    <h1>File Concatenator</h1>
+    <div class="domain-input">
+        <input type="text" id="domain" placeholder="Enter domain (optional)">
+    </div>
+    <div class="file-upload">
+        <input type="file" id="file1">
+    </div>
+    <div class="file-upload">
+        <input type="file" id="file2">
+    </div>
+    <div class="file-upload">
+        <input type="file" id="file3">
+    </div>
+    <div class="file-upload">
+        <input type="file" id="file4">
+    </div>
+    <div class="file-upload">
+        <input type="file" id="file5">
+    </div>
+    <textarea id="output" rows="10" cols="50"></textarea>
+    <div class="buttons">
+        <button onclick="concatenateFiles()">Concatenate Files</button>
+        <button onclick="downloadCombinedFile()">Download Combined File</button>
+    </div>
+
+    <script>
+        function concatenateFiles() {
+            const fileInputs = [
+                document.getElementById('file1'),
+                document.getElementById('file2'),
+                document.getElementById('file3'),
+                document.getElementById('file4'),
+                document.getElementById('file5')
+            ];
+            const files = fileInputs.map(input => input.files[0]).filter(file => file);
+            const domain = document.getElementById('domain').value;
+
+            if (files.length === 0) {
+                alert('Please select at least one file.');
+                return;
+            }
+
+            let outputContent = '';
+
+            const readFilePromises = files.map(file => {
+                return file.text().then(content => ({
+                    name: file.name,
+                    content: content
+                }));
+            });
+
+            Promise.all(readFilePromises)
+                .then(results => {
+                    results.forEach(result => {
+                        const lines = result.content.split('\n');
+                        lines.forEach(line => {
+                            if (domain) {
+                                outputContent += domain + line + '\n';
+                            } else {
+                                outputContent += line + '\n';
+                            }
+                        });
+                    });
+                    document.getElementById('output').value = outputContent;
+                })
+                .catch(error => {
+                    console.error('Error reading files:', error);
+                    alert('An error occurred while reading the files.');
+                });
+        }
+
+        function downloadCombinedFile() {
+            const text = document.getElementById('output').value;
+            if (text === '') {
+                alert('No content to download.');
+                return;
+            }
+
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'combined_file.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    </script>
+</body>
+</html>

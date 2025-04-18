@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple Navigation</title>
+    <style>
+        body {
+            display: flex;
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+        nav {
+            width: 200px;
+            background-color: #f4f4f4;
+            padding: 15px;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+        nav input[type="text"] {
+            width: 100%;
+            padding: 5px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+        nav a {
+            display: block;
+            color: #333;
+            text-decoration: none;
+            margin: 10px 0;
+        }
+        nav a:hover {
+            background-color: #ddd;
+            padding: 5px;
+        }
+        iframe {
+            flex-grow: 1;
+            height: 100vh;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <h2>Navigation</h2>
+        <input type="text" id="searchBox" placeholder="Search...">
+        <a href="open-urls-in-new-tabs.html" target="contentFrame">Open URLs in Tabs</a>
+        <a href="concat.html" target="contentFrame">Concat Word Files</a>
+        <a href="apk-compiler-commands.html" target="contentFrame">Compile / Decompile APK</a>
+    </nav>
+    <iframe name="contentFrame" src="apk-compiler-commands.html"></iframe>
+
+    <script>
+        document.getElementById('searchBox').addEventListener('input', function() {
+            var filter = this.value.toLowerCase();
+            var links = document.querySelectorAll('nav a');
+            links.forEach(function(link) {
+                if (link.textContent.toLowerCase().includes(filter)) {
+                    link.style.display = '';
+                } else {
+                    link.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

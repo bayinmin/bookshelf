@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Recompile Application Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .output {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            white-space: pre-wrap; /* Preserve whitespace and new lines */
+        }
+    </style>
+</head>
+<body>
+    <h1>Recompile Application Form</h1>
+    <form>
+        <div class="form-group">
+            <label for="signingKey">Location of Signing Key:</label>
+            <input type="text" id="signingKey" name="signingKey" placeholder="C:\temp\signing-key.jks">
+        </div>
+        <div class="form-group">
+            <label for="jarsigner">Location of Jarsigner:</label>
+            <input type="text" id="jarsigner" name="jarsigner" placeholder="jarsigner.jar">
+        </div>
+        <div class="form-group">
+            <label for="apktool">Location of Apktool:</label>
+            <input type="text" id="apktool" name="apktool" placeholder="C:\temp\apktool.jar">
+        </div>
+        <div class="form-group">
+            <label for="applicationFolder">Folder Path to Application to be Recompiled:</label>
+            <input type="text" id="applicationFolder" name="applicationFolder" placeholder="C:\temp\decompiled-apk-folder\">
+        </div>
+        <div class="form-group">
+            <label for="apkFile">Location of APK File:</label>
+            <input type="text" id="apkFile" name="apkFile" placeholder="C:\temp\target.apk">
+        </div>
+        <div class="form-group">
+            <label for="keyAlias">Key Alias Name:</label>
+            <input type="text" id="keyAlias" name="keyAlias" placeholder="app-release-key">
+        </div>
+        <button type="button" onclick="submitForm()">Re-Compile</button>
+        <button type="button" onclick="clearOutput()">Clear</button>
+        <button type="button" onclick="fillDefault()">Fill Default</button>
+    </form>
+    <div id="commandOutput" class="output"></div>
+
+    <script>
+        function submitForm() {
+            const apktool = document.getElementById('apktool').value;
+            const applicationFolder = document.getElementById('applicationFolder').value;
+            const apkFile = document.getElementById('apkFile').value;
+            const signingKey = document.getElementById('signingKey').value;
+            const keyAlias = document.getElementById('keyAlias').value;
+
+            const buildCommand = `java -jar ${apktool} b ${applicationFolder}`;
+            const decompileCommand = `java -jar ${apktool} d ${apkFile}`;
+            const jarsignerCommand = `jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 -keystore ${signingKey} ${apkFile} ${keyAlias}`;
+            const verifyCommand = `jarsigner -verify ${applicationFolder}\dist\\apk-name.apk`;
+            const keytoolCommand = `keytool -genkey -v -keystore app-release-key.jks -keyalg RSA -keysize 2048 -validity 10000 -alias app-release-key`;
+
+            document.getElementById('commandOutput').innerText = `// Recompilation Command\n${buildCommand}\n\n// Decompilation Command\n${decompileCommand}\n\n// Signing the apk\n${jarsignerCommand}\n\n// Verifying Signing\n${verifyCommand}\n\n// Creating self-signed certificate\n${keytoolCommand}`;
+        }
+
+        function clearOutput() {
+            document.getElementById('commandOutput').innerText = '';
+        }
+
+        function fillDefault() {
+            document.getElementById('signingKey').value = 'C:\\temp\\signing-key.jks';
+            document.getElementById('jarsigner').value = 'jarsigner.jar';
+            document.getElementById('apktool').value = 'C:\\temp\\apktool.jar';
+            document.getElementById('applicationFolder').value = 'C:\\temp\\decompiled-apk-folder\\';
+            document.getElementById('apkFile').value = 'C:\\temp\\target.apk';
+            document.getElementById('keyAlias').value = 'app-release-key';
+        }
+    </script>
+</body>
+</html>
