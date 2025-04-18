@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JWKS Validator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            padding: 20px;
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+        }
+        input[type="file"] {
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            border: none;
+            background-color: #4CAF50; /* Green */
+            color: white;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .clear-button {
+            background-color: #f44336; /* Red */
+        }
+        .clear-button:hover {
+            background-color: #e53935;
+        }
+        .output {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        .safe {
+            color: green;
+        }
+        .unsafe {
+            color: red;
+        }
+        .explanation {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+        .explanation h2 {
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>JWKS Validator</h1>
+    <div class="explanation">
+        <h2>What Does This Script Do?</h2>
+        <p>This script validates a JSON Web Key Set (JWKS) file to check for the presence of sensitive private key components, including:</p>
+        <ul>
+            <li><strong>d</strong> - The private exponent in RSA keys.</li>
+            <li><strong>p</strong> - One of the prime factors of the RSA modulus.</li>
+            <li><strong>q</strong> - Another prime factor of the RSA modulus.</li>
+        </ul>
+        <p>If these fields are exposed, it could compromise the security of the key and allow unauthorized parties to decrypt or forge data. This validator ensures your JWKS is safe for public sharing by flagging any exposed private key data.</p>
+    </div>
+
+    <textarea id="jsonInput" placeholder="Paste JWKS JSON here"></textarea><br>
+    <input type="file" id="fileInput"><br>
+    <button onclick="validateJWKS()">Validate JWKS</button>
+    <button class="clear-button" onclick="clearAll()">Clear All</button>
+
+    <div id="output" class="output"></div>
+
+    <script>
+        const sensitiveFields = ["d", "p", "q"]; // Private key components
+
+        document.getElementById('fileInput').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('jsonInput').value = e.target.result;
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        function validateJWKS() {
+            const input = document.getElementById('jsonInput').value;
+            const output = document.getElementById('output');
+
+            try {
+                const jwks = JSON.parse(input);
+                let isSafe = true;
+
+                output.innerHTML = "Finding d, p, q entries in the JWKS file...";
+                
+                for (const key of jwks.keys || []) {
+                    const exposedFields = sensitiveFields.filter(field => field in key);
+                    
+                    if (exposedFields.length > 0) {
+                        output.innerHTML = `<p class="unsafe">Private key components exposed: ${exposedFields.join(', ')}</p>`;
+                        output.innerHTML += `<p class="unsafe">Exposed Key: ${JSON.stringify(key)}</p>`;
+                        isSafe = false;
+                        break;
+                    }
+                }
+
+                if (isSafe) {
+                    output.innerHTML = `<p class="safe">No private keys detected. JWKS is safe.</p>`;
+                }
+            } catch (e) {
+                output.innerHTML = `<p class="unsafe">Error: Invalid JSON format.</p>`;
+            }
+        }
+
+        function clearAll() {
+            document.getElementById('jsonInput').value = '';
+            document.getElementById('fileInput').value = '';
+            document.getElementById('output').innerHTML = '';
+        }
+    </script>
+</body>
+</html>
