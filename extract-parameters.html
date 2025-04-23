@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>URL Parameter Extractor</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    textarea, input {
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 8px;
+      font-size: 14px;
+    }
+    textarea {
+      height: 100px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+    .trigger-button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+    }
+    .trigger-button:hover {
+      background-color: #45a049;
+    }
+    .clear-button {
+      background-color: #FFC107;
+      color: white;
+      border: none;
+    }
+    .clear-button:hover {
+      background-color: white;
+      color: black;
+      border: 2px solid #FFC107;
+    }
+    .download-button {
+      background-color: #008CBA;
+      color: white;
+      border: none;
+    }
+    .download-button:hover {
+      background-color: #005F8A;
+    }
+  </style>
+</head>
+<body>
+  <h1>URL Parameter Extractor</h1>
+  <!-- Parameter Filter Input (Optional) -->
+   <h4>Target Parameter Name </h4>
+  <input id="parameterFilter" type="text" placeholder="Enter a parameter name to filter (optional)">
+
+  <!-- Input Text View -->
+  <h4>URLs </h4>
+  <textarea id="urlInput" placeholder="Enter a list of URLs, one per line"></textarea>
+  
+  <!-- Output Text View for parameter=value -->
+  <h4>Extracted Parameters </h4>
+  <textarea id="paramOutput" readonly placeholder="Extracted parameter=value pairs will appear here"></textarea>
+  
+  <!-- Output Text View for CSV -->
+  <h4>Extracted Parameters in CSV Format</h4>
+  <textarea id="csvOutput" readonly placeholder="Extracted parameters in CSV format will appear here"></textarea>
+  
+  <!-- Buttons -->
+  <button class="trigger-button" onclick="extractParams()">Extract Parameters</button>
+  <button class="clear-button" onclick="clearAll()">Clear All</button>
+  <button class="download-button" onclick="downloadCSV()">Download CSV</button>
+
+  <script>
+    function extractParams() {
+      const parameterFilter = document.getElementById('parameterFilter').value.trim();
+      const urls = document.getElementById('urlInput').value.split(/\r?\n/);
+      const params = [];
+      const csvRows = [];
+
+      urls.forEach(url => {
+        try {
+          const queryString = new URL(url.trim()).search;
+          if (queryString) {
+            const searchParams = new URLSearchParams(queryString);
+            if (parameterFilter) {
+              // Extract only the specified parameter
+              const value = searchParams.get(parameterFilter);
+              if (value) {
+                params.push(`${parameterFilter}=${value}`);
+                csvRows.push(`${parameterFilter},${value}`);
+              }
+            } else {
+              // Extract all parameters
+              for (const [key, value] of searchParams) {
+                params.push(`${key}=${value}`);
+                csvRows.push(`${key},${value}`);
+              }
+            }
+          }
+        } catch (error) {
+          console.warn(`Invalid URL: ${url}`);
+        }
+      });
+
+      // Output unique parameter=value pairs
+      const uniqueParams = [...new Set(params)];
+      document.getElementById('paramOutput').value = uniqueParams.join('\n');
+      
+      // Output CSV formatted parameters
+      const uniqueCSVRows = [...new Set(csvRows)];
+      document.getElementById('csvOutput').value = uniqueCSVRows.join('\n');
+    }
+
+    function clearAll() {
+      if (confirm('Are you sure you want to clear all fields?')) {
+        document.getElementById('parameterFilter').value = '';
+        document.getElementById('urlInput').value = '';
+        document.getElementById('paramOutput').value = '';
+        document.getElementById('csvOutput').value = '';
+      }
+    }
+
+    function downloadCSV() {
+      const csvContent = document.getElementById('csvOutput').value;
+      if (csvContent.trim() === '') {
+        alert('No CSV content to download.');
+        return;
+      }
+
+      const blob = new Blob([csvContent], { type: 'text/csv' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'parameters.csv';
+      link.click();
+    }
+  </script>
+</body>
+</html>
