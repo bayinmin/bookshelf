@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>URL Extractor with Counts</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    textarea {
+      width: 100%;
+      height: 100px;
+      margin-bottom: 10px;
+    }
+    button {
+      padding: 15px 32px; /* Match the padding of both buttons */
+      font-size: 16px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    .extract-button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+    }
+    .warning-button {
+      background-color: #FFC107;
+      border: none;
+      color: white;
+    }
+    .warning-button:hover {
+      background-color: white;
+      color: black;
+      border: 2px solid #FFC107;
+    }
+  </style>
+</head>
+<body>
+  <h1>URL Extractor with Counts</h1>
+  <!-- Input Text View -->
+  <textarea id="urlInput" placeholder="Enter a list of URLs, one per line"></textarea>
+  
+  <!-- Output Domain Names Only -->
+  <p>Unique Domain Count: <span id="domainCount">0</span></p>
+  <textarea id="domainOutput" readonly placeholder="Unique domain names will appear here"></textarea>
+ 
+  <!-- Output URLs up to First Slash -->
+  <p>Unique Base URL Count: <span id="baseURLCount">0</span></p>
+  <textarea id="baseURLOutput" readonly placeholder="Unique URLs up to the first slash will appear here"></textarea>
+ 
+  <!-- Buttons -->
+  <button class="extract-button" onclick="extractUrls()">Extract URLs</button>
+  <button class="warning-button" onclick="clearAll()">Clear All</button>
+
+  <script>
+    function extractUrls() {
+      const urls = document.getElementById('urlInput').value.split(/\r?\n/);
+      const domains = new Set();
+      const urlsToFirstSlash = new Set();
+
+      urls.forEach(url => {
+        try {
+          const trimmedUrl = url.trim();
+          const domain = new URL(trimmedUrl).hostname;
+          domains.add(domain);
+          
+          const urlToFirstSlash = trimmedUrl.split('/').slice(0, 3).join('/');
+          urlsToFirstSlash.add(urlToFirstSlash);
+        } catch (error) {
+          console.warn(`Invalid URL: ${url}`);
+        }
+      });
+
+      document.getElementById('domainOutput').value = Array.from(domains).join('\n');
+      document.getElementById('domainCount').textContent = domains.size;
+
+      document.getElementById('baseURLOutput').value = Array.from(urlsToFirstSlash).join('\n');
+      document.getElementById('baseURLCount').textContent = urlsToFirstSlash.size;
+    }
+
+    function clearAll() {
+      if (confirm('Are you sure you want to clear all fields?')) {
+        document.getElementById('urlInput').value = '';
+        document.getElementById('domainOutput').value = '';
+        document.getElementById('baseURLOutput').value = '';
+        document.getElementById('domainCount').textContent = '0';
+        document.getElementById('baseURLCount').textContent = '0';
+      }
+    }
+  </script>
+</body>
+</html>
