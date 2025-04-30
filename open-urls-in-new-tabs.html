@@ -68,6 +68,7 @@
     <textarea id="pathInput" rows="10" placeholder="Enter paths here, one per line"></textarea><br>
     <button onclick="openUrls()">Open URLs</button>
     <button onclick="combineUrlsAndPaths()">Combine URLs and Paths</button>
+	<button onclick="removeDuplicates()">Remove Duplicate</button>
     <button class="warning-button" onclick="clearAllFields()">Clear All</button>
 
     <script>
@@ -114,6 +115,14 @@
             document.getElementById('urlInput').value = '';
             document.getElementById('pathInput').value = '';
         }
+		
+		function removeDuplicates() {
+			const urlInput = document.getElementById('urlInput').value;
+			const urls = urlInput.split('\n').map(url => url.trim());
+			const uniqueUrls = [...new Set(urls)];  // Using Set to remove duplicates
+			document.getElementById('urlInput').value = uniqueUrls.join('\n');
+		}
+
     </script>
 </body>
 </html>
