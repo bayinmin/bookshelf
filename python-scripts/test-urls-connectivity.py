@@ -7,13 +7,15 @@ import argparse
 # Suppress warnings
 warnings.filterwarnings("ignore")
 
+port = "8080"
+
 # Proxy configuration
 proxy = {
-    "http": "http://127.0.0.1:8080",
-    "https": "http://127.0.0.1:8080"
+    "http": f"http://127.0.0.1:{port}",
+    "https": f"http://127.0.0.1:{port}"
 }
-
 # Function to make HTTP requests
+
 def fetch_url(url, writer, use_proxy):
     try:
         if use_proxy:
@@ -21,8 +23,8 @@ def fetch_url(url, writer, use_proxy):
         else:
             response = requests.get(url, verify=False)  # Ignore SSL errors with verify=False
         
-        print(f"URL: {url} - Status Code: {response.status_code}")
-        writer.writerow([url, response.status_code])  # Write to CSV file
+        print(f"URL: {url} - Status Code: {response.status_code} - response length: {len(response.content)}")
+        writer.writerow([url, response.status_code, len(response.content)])  # Write to CSV file
     except requests.exceptions.RequestException as e:
         print(f"URL: {url} - Error: {e}")
         writer.writerow([url, "Error"])  # Write error to CSV file
@@ -32,7 +34,7 @@ def read_urls_from_file(file_name, output_file, use_proxy):
     try:
         with open(file_name, "r") as file, open(output_file, "w", newline="") as csvfile:
             writer = csv.writer(csvfile)
-            writer.writerow(["URL", "Status Code"])  # Write header
+            writer.writerow(["URL", "Status Code","Response Length"])  # Write header
             for line in file:
                 url = line.strip()  # Remove any whitespace
                 if url:  # Ensure the line is not empty
