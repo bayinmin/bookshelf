@@ -30,16 +30,27 @@ def fetch_url(url, writer, use_proxy):
         writer.writerow([url, "Error"])  # Write error to CSV file
 
 # Reading URLs from the text file
-def read_urls_from_file(file_name, output_file, use_proxy):
+def read_urls_from_file(file_name, output_file, use_proxy,path):
     try:
         with open(file_name, "r") as file, open(output_file, "w", newline="") as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow(["URL", "Status Code","Response Length"])  # Write header
             for line in file:
                 url = line.strip()  # Remove any whitespace
+                url = url + path
                 if url:  # Ensure the line is not empty
                     time.sleep(0.5)  # Pause for 0.5 seconds before each request
                     fetch_url(url, writer, use_proxy)
+    except FileNotFoundError:
+        print(f"File not found: {file_name}")
+        
+        
+# Reading URLs from the text file
+def read_paths_from_file(file_name, output_file, use_proxy):
+    try:
+        with open(file_name, "r") as file:
+            for path in file:
+               read_urls_from_file(input_file, output_file, use_proxy,path)
     except FileNotFoundError:
         print(f"File not found: {file_name}")
 
@@ -48,11 +59,16 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Fetch URLs from a file and log their statuses. Proxy is enabled by default.")
     parser.add_argument("--input", type=str, help="Path to the input file containing URLs", required=True)
     parser.add_argument("--output", type=str, help="Path to the output CSV file (optional; defaults to 'test-connectivity-output.csv')", default="test-connectivity-output.csv")
+    parser.add_argument("--paths", type=str, help="Paths to the output CSV file.")
     parser.add_argument("--no-proxy", action="store_true", help="Disable proxy usage")
     args = parser.parse_args()
 
     input_file = args.input
     output_file = args.output
+    paths_file = args.paths
     use_proxy = not args.no_proxy  # Proxy is enabled by default; --no-proxy disables it
-
-    read_urls_from_file(input_file, output_file, use_proxy)
+    
+    if paths_file:
+        read_paths_from_file(paths_file, output_file, use_proxy)
+    else:
+        read_urls_from_file(input_file, output_file, use_proxy)
