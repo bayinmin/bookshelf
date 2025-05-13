@@ -14,6 +14,12 @@ proxy = {
     "http": f"http://127.0.0.1:{port}",
     "https": f"http://127.0.0.1:{port}"
 }
+
+# search string
+search_string = "google"
+search_string_found = ""
+
+
 # Function to make HTTP requests
 
 def fetch_url(url, writer, use_proxy):
@@ -22,21 +28,26 @@ def fetch_url(url, writer, use_proxy):
             response = requests.get(url, proxies=proxy, verify=False)  # Ignore SSL errors with verify=False
         else:
             response = requests.get(url, verify=False)  # Ignore SSL errors with verify=False
+            
+        if search_string in response.text:
+            search_string_found = "Y"
+        else:
+            search_string_found = "N"
         
-        print(f"URL: {url} - Status Code: {response.status_code} - response length: {len(response.content)}")
-        writer.writerow([url, response.status_code, len(response.content)])  # Write to CSV file
+        print(f"URL: {url} | Status Code: {response.status_code} | response length: {len(response.content)} | String found: {search_string_found}")
+        writer.writerow([url, response.status_code, len(response.content),search_string_found])  # Write to CSV file
     except requests.exceptions.RequestException as e:
         print(f"URL: {url} - Error: {e}")
         writer.writerow([url, "Error"])  # Write error to CSV file
 
 # Reading URLs from the text file
-def read_urls_from_file(file_name, output_file, use_proxy,path):
+def read_urls_from_file(file_name, output_file, use_proxy,path=""):
     try:
         with open(file_name, "r") as file, open(output_file, "w", newline="") as csvfile:
             writer = csv.writer(csvfile)
-            writer.writerow(["URL", "Status Code","Response Length"])  # Write header
+            writer.writerow(["URL", "Status Code","Response Length","String Found"])  # Write header
             for line in file:
-                url = line.strip()  # Remove any whitespace
+                url = (line.strip() + path).strip()# Remove any whitespace
                 url = url + path
                 if url:  # Ensure the line is not empty
                     time.sleep(0.5)  # Pause for 0.5 seconds before each request
