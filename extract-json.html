@@ -20,6 +20,10 @@
             background-color: yellow;
             color: black;
         }
+        #downloadBtn {
+            background-color: blue;
+            color: white;
+        }
         textarea, input {
             width: 90%;
         }
@@ -68,6 +72,20 @@
             document.getElementById("paramsOutput").value = "";
             document.getElementById("csvOutput").value = "";
         }
+
+        function downloadCSV() {
+            let csvContent = document.getElementById("csvOutput").value;
+            if (!csvContent) {
+                alert("No CSV data to download!");
+                return;
+            }
+
+            let blob = new Blob([csvContent], { type: "text/csv" });
+            let a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = "converted_data.csv";
+            a.click();
+        }
     </script>
 </head>
 <body>
@@ -80,7 +98,8 @@
     <textarea id="jsonInput" rows="10" cols="50"></textarea><br><br>
     
     <button id="convertBtn" onclick="convertJSON()">Convert</button>
-    <button id="clearBtn" onclick="clearAllFields()">Clear All</button><br><br>
+    <button id="clearBtn" onclick="clearAllFields()">Clear All</button>
+    <button id="downloadBtn" onclick="downloadCSV()">Download CSV</button><br><br>
     
     <label>Extracted Parameters:</label><br>
     <textarea id="paramsOutput" rows="10" cols="50" readonly></textarea><br><br>
