@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON to CSV Converter</title>
+    <style>
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        #convertBtn {
+            background-color: green;
+            color: white;
+        }
+        #clearBtn {
+            background-color: yellow;
+            color: black;
+        }
+        textarea, input {
+            width: 90%;
+        }
+    </style>
+    <script>
+        function convertJSON() {
+            try {
+                let jsonInput = document.getElementById("jsonInput").value;
+                let searchKey = document.getElementById("searchKey").value.trim();
+                let jsonObject = JSON.parse(jsonInput);
+
+                let csvOutput = "Parameter,Value\n";
+                let extractedParams = "";
+
+                function parseObject(obj, prefix = "") {
+                    for (let key in obj) {
+                        let newKey = prefix ? `${prefix}.${key}` : key;
+
+                        if (typeof obj[key] === "object" && !Array.isArray(obj[key])) {
+                            parseObject(obj[key], newKey);
+                        } else if (Array.isArray(obj[key])) {
+                            obj[key].forEach((item, index) => {
+                                parseObject(item, `${newKey}[${index}]`);
+                            });
+                        } else {
+                            if (!searchKey || newKey.includes(searchKey)) {
+                                csvOutput += `${newKey},${obj[key]}\n`;
+                                extractedParams += `${newKey}: ${obj[key]}\n`;
+                            }
+                        }
+                    }
+                }
+
+                parseObject(jsonObject);
+
+                document.getElementById("paramsOutput").value = extractedParams;
+                document.getElementById("csvOutput").value = csvOutput;
+            } catch (error) {
+                alert("Invalid JSON format! Please check your input.");
+            }
+        }
+
+        function clearAllFields() {
+            document.getElementById("searchKey").value = "";
+            document.getElementById("jsonInput").value = "";
+            document.getElementById("paramsOutput").value = "";
+            document.getElementById("csvOutput").value = "";
+        }
+    </script>
+</head>
+<body>
+    <h2>JSON to CSV Converter</h2>
+    
+    <label>Search Key (Optional):</label><br>
+    <input type="text" id="searchKey" placeholder="Enter key to filter"><br><br>
+
+    <label>JSON Object:</label><br>
+    <textarea id="jsonInput" rows="10" cols="50"></textarea><br><br>
+    
+    <button id="convertBtn" onclick="convertJSON()">Convert</button>
+    <button id="clearBtn" onclick="clearAllFields()">Clear All</button><br><br>
+    
+    <label>Extracted Parameters:</label><br>
+    <textarea id="paramsOutput" rows="10" cols="50" readonly></textarea><br><br>
+
+    <label>CSV Format:</label><br>
+    <textarea id="csvOutput" rows="10" cols="50" readonly></textarea><br><br>
+</body>
+</html>

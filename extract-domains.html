@@ -45,6 +45,10 @@
   <!-- Input Text View -->
   <textarea id="urlInput" placeholder="Enter a list of URLs, one per line"></textarea>
   
+  <!-- Buttons -->
+  <button class="extract-button" onclick="extractUrls()">Extract URLs</button>
+  <button class="warning-button" onclick="clearAll()">Clear All</button>
+  
   <!-- Output Domain Names Only -->
   <p>Unique Domain Count: <span id="domainCount">0</span></p>
   <textarea id="domainOutput" readonly placeholder="Unique domain names will appear here"></textarea>
@@ -53,9 +57,7 @@
   <p>Unique Base URL Count: <span id="baseURLCount">0</span></p>
   <textarea id="baseURLOutput" readonly placeholder="Unique URLs up to the first slash will appear here"></textarea>
  
-  <!-- Buttons -->
-  <button class="extract-button" onclick="extractUrls()">Extract URLs</button>
-  <button class="warning-button" onclick="clearAll()">Clear All</button>
+
 
   <script>
     function extractUrls() {

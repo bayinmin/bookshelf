@@ -16,13 +16,17 @@ proxy = {
 }
 
 # search string
-search_string = "google"
+search_string = ""
 search_string_found = ""
+
+row_processed = 0
 
 
 # Function to make HTTP requests
 
 def fetch_url(url, writer, use_proxy):
+    global row_processed
+    row_processed += 1
     try:
         if use_proxy:
             response = requests.get(url, proxies=proxy, verify=False)  # Ignore SSL errors with verify=False
@@ -79,7 +83,12 @@ if __name__ == "__main__":
     paths_file = args.paths
     use_proxy = not args.no_proxy  # Proxy is enabled by default; --no-proxy disables it
     
+    print(f"[i] Processing begins....\n\n")
+
     if paths_file:
         read_paths_from_file(paths_file, output_file, use_proxy)
     else:
         read_urls_from_file(input_file, output_file, use_proxy)
+        
+    print(f"\n[i] Total row(s) processed: {row_processed}")
+    print(f"[i] Processing is complete!")

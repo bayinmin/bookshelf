@@ -62,6 +62,11 @@
   <h4>URLs </h4>
   <textarea id="urlInput" placeholder="Enter a list of URLs, one per line"></textarea>
   
+  <!-- Buttons -->
+  <button class="trigger-button" onclick="extractParams()">Extract Parameters</button>
+  <button class="download-button" onclick="downloadCSV()">Download CSV</button>
+  <button class="clear-button" onclick="clearAll()">Clear All</button>
+  
   <!-- Output Text View for parameter=value -->
   <h4>Extracted Parameters </h4>
   <textarea id="paramOutput" readonly placeholder="Extracted parameter=value pairs will appear here"></textarea>
@@ -70,10 +75,7 @@
   <h4>Extracted Parameters in CSV Format</h4>
   <textarea id="csvOutput" readonly placeholder="Extracted parameters in CSV format will appear here"></textarea>
   
-  <!-- Buttons -->
-  <button class="trigger-button" onclick="extractParams()">Extract Parameters</button>
-  <button class="download-button" onclick="downloadCSV()">Download CSV</button>
-  <button class="clear-button" onclick="clearAll()">Clear All</button>
+
 
   <script>
     function extractParams() {
