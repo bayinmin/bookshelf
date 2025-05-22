@@ -3,6 +3,8 @@ import csv
 import requests
 import argparse
 import warnings
+from urllib.parse import urlparse
+
 
 # Suppress warnings
 warnings.filterwarnings("ignore")
