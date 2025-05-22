@@ -1,10 +1,19 @@
 import json
 import csv
 import requests
+import argparse
 
 # Define input and output files
 input_file = "urls.txt"  # File containing URLs line by line
 output_file = "output.csv"
+
+# Parse command-line arguments
+parser = argparse.ArgumentParser(description="Extract paths from OpenAPI documents.")
+parser.add_argument("--no-proxy", action="store_true", help="Disable proxy settings")
+args = parser.parse_args()
+
+# Define default proxy settings
+proxies = {"http": "http://localhost:8080", "https": "http://localhost:8080"} if not args.no_proxy else {}
 
 # Open output CSV file for writing
 with open(output_file, mode="w", newline="") as csv_file:
@@ -17,8 +26,8 @@ with open(output_file, mode="w", newline="") as csv_file:
 
     for url in urls:
         try:
-            # Make GET request
-            response = requests.get(url)
+            # Make GET request with proxy settings and SSL verification disabled
+            response = requests.get(url, proxies=proxies, verify=False)
             response.raise_for_status()  # Raise error for bad responses
 
             # Parse JSON response
