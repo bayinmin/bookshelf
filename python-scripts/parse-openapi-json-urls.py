@@ -2,6 +2,10 @@ import json
 import csv
 import requests
 import argparse
+import warnings
+
+# Suppress warnings
+warnings.filterwarnings("ignore")
 
 # Define input and output files
 input_file = "urls.txt"  # File containing URLs line by line
@@ -18,7 +22,7 @@ proxies = {"http": "http://localhost:8080", "https": "http://localhost:8080"} if
 # Open output CSV file for writing
 with open(output_file, mode="w", newline="") as csv_file:
     writer = csv.writer(csv_file)
-    writer.writerow(["URL", "Paths"])  # CSV header
+    writer.writerow(["Base URL", "Path"])  # CSV header
 
     # Read URLs from the file
     with open(input_file, "r") as f:
@@ -33,13 +37,15 @@ with open(output_file, mode="w", newline="") as csv_file:
             # Parse JSON response
             data = response.json()
             paths = list(data.get("paths", {}).keys())
-            paths_str = "; ".join(paths)  # Separate paths with semicolon
 
-            # Print to console
-            print(f"Processed: {url} -> Paths: {paths_str}")
+            # Extract base URL
+            parsed_url = urlparse(url)
+            base_url = f"{parsed_url.scheme}://{parsed_url.netloc}"
 
-            # Write to CSV
-            writer.writerow([url, paths_str])
+            # Write each path to CSV line by line with the base URL
+            for path in paths:
+                writer.writerow([base_url, path])
+                print(f"Processed: {base_url} -> {path}")
 
         except requests.RequestException:
             print(f"Error fetching: {url}")
