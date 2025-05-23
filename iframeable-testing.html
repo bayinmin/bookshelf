@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Framer with Error Handling</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #4CAF50;
+            border-radius: 5px;
+            outline: none;
+            background-color: #f9f9f9;
+            transition: all 0.3s ease;
+        }
+        textarea:focus {
+            border-color: #2196F3;
+            background-color: #fff;
+            box-shadow: 0 0 5px rgba(33, 150, 243, 0.5);
+        }
+        button {
+            padding: 10px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        .frame-btn {
+            background-color: lightblue;
+        }
+        .clear-btn {
+            background-color: yellow;
+        }
+        .output {
+            margin-top: 20px;
+        }
+        .framed-url {
+            margin-bottom: 10px;
+        }
+        .error-message {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+	<h1>Frameable Response - Clickjacking Testing</h1>
+    <h3>Enter URLs (one per line):</h2>
+	<ul>
+		<li>Enter target URLs you want to embed in iFrame (one per line)</li>
+		<li>Click the frame button</li>
+	</ul>
+    <textarea id="urlInput"></textarea><br>
+
+    <button class="frame-btn" onclick="frameUrls()">Frame URLs</button>
+    <button class="clear-btn" onclick="clearAll()">Clear All</button>
+
+    <div class="output" id="output"></div>
+
+    <script>
+        function frameUrls() {
+            let outputDiv = document.getElementById("output");
+            outputDiv.innerHTML = ""; // Clear previous content
+            let urls = document.getElementById("urlInput").value.split("\n");
+
+            urls.forEach(url => {
+                url = url.trim();
+                if (url) {
+                    let div = document.createElement("div");
+                    div.className = "framed-url";
+                    div.innerHTML = `<h3>The URL being framed: ${url}</h3>`;
+
+                    let iframe = document.createElement("iframe");
+                    iframe.src = url;
+                    iframe.width = "600";
+                    iframe.height = "400";
+
+                    // Error handling
+                    iframe.onload = function () {
+                        try {
+                            if (!iframe.contentWindow || iframe.contentWindow.location.href === "about:blank") {
+                                throw new Error(`Iframe failed to load: ${url}`);
+                            }
+                        } catch (error) {
+                            handleIframeError(error, div, url);
+                        }
+                    };
+
+                    iframe.onerror = function () {
+                        handleIframeError(new Error(`Iframe loading failed: ${url}`), div, url);
+                    };
+
+                    div.appendChild(iframe);
+                    outputDiv.appendChild(div);
+                }
+            });
+        }
+
+        function handleIframeError(error, container, url) {
+            console.error(`Error with ${url}:`, error);
+            console.error("Stacktrace:", error.stack);
+            let errorMsg = document.createElement("p");
+            errorMsg.className = "error-message";
+            errorMsg.textContent = `Error loading ${url}: ${error.message}`;
+            container.appendChild(errorMsg);
+        }
+
+        function clearAll() {
+            document.getElementById("urlInput").value = "";
+            document.getElementById("output").innerHTML = "";
+        }
+    </script>
+
+</body>
+</html>
