@@ -45,6 +45,10 @@
             color: red;
             font-weight: bold;
         }
+		.target-url-color {
+			color: red;
+			font-weight: bold;
+		}
     </style>
 </head>
 <body>
@@ -72,8 +76,7 @@
                 if (url) {
                     let div = document.createElement("div");
                     div.className = "framed-url";
-                    div.innerHTML = `<h3>The URL being framed: ${url}</h3>`;
-
+                    div.innerHTML = `<h3>The URL being framed: <span style="color: red">${url}</span></h3>`;
                     let iframe = document.createElement("iframe");
                     iframe.src = url;
                     iframe.width = "600";
