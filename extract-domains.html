@@ -15,7 +15,7 @@
       margin-bottom: 10px;
     }
     button {
-      padding: 15px 32px; /* Match the padding of both buttons */
+      padding: 15px 32px;
       font-size: 16px;
       border-radius: 4px;
       cursor: pointer;
@@ -52,18 +52,21 @@
   <!-- Output Domain Names Only -->
   <p>Unique Domain Count: <span id="domainCount">0</span></p>
   <textarea id="domainOutput" readonly placeholder="Unique domain names will appear here"></textarea>
- 
+
   <!-- Output URLs up to First Slash -->
   <p>Unique Base URL Count: <span id="baseURLCount">0</span></p>
   <textarea id="baseURLOutput" readonly placeholder="Unique URLs up to the first slash will appear here"></textarea>
- 
 
+  <!-- Output Full URLs without Parameters -->
+  <p>Unique Full URL Count: <span id="fullURLCount">0</span></p>
+  <textarea id="fullURLOutput" readonly placeholder="Full URLs without parameters will appear here"></textarea>
 
   <script>
     function extractUrls() {
       const urls = document.getElementById('urlInput').value.split(/\r?\n/);
       const domains = new Set();
       const urlsToFirstSlash = new Set();
+      const fullUrls = new Set();
 
       urls.forEach(url => {
         try {
@@ -73,6 +76,9 @@
           
           const urlToFirstSlash = trimmedUrl.split('/').slice(0, 3).join('/');
           urlsToFirstSlash.add(urlToFirstSlash);
+
+          const fullUrl = trimmedUrl.split('?')[0]; // Remove query parameters
+          fullUrls.add(fullUrl);
         } catch (error) {
           console.warn(`Invalid URL: ${url}`);
         }
@@ -83,6 +89,9 @@
 
       document.getElementById('baseURLOutput').value = Array.from(urlsToFirstSlash).join('\n');
       document.getElementById('baseURLCount').textContent = urlsToFirstSlash.size;
+
+      document.getElementById('fullURLOutput').value = Array.from(fullUrls).join('\n');
+      document.getElementById('fullURLCount').textContent = fullUrls.size;
     }
 
     function clearAll() {
@@ -90,8 +99,10 @@
         document.getElementById('urlInput').value = '';
         document.getElementById('domainOutput').value = '';
         document.getElementById('baseURLOutput').value = '';
+        document.getElementById('fullURLOutput').value = '';
         document.getElementById('domainCount').textContent = '0';
         document.getElementById('baseURLCount').textContent = '0';
+        document.getElementById('fullURLCount').textContent = '0';
       }
     }
   </script>
