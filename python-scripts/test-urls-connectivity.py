@@ -38,8 +38,8 @@ def fetch_url(url, writer, use_proxy):
         else:
             search_string_found = "N"
         
-        print(f"URL: {url} | Status Code: {response.status_code} | response length: {len(response.content)} | String found: {search_string_found}")
-        writer.writerow([url, response.status_code, len(response.content),search_string_found])  # Write to CSV file
+        print(f"String found: {search_string_found} | Status Code: {response.status_code} | URL: {url} | response size: {len(response.content)}")
+        writer.writerow([search_string_found, response.status_code, url, len(response.content)])  # Write to CSV file
     except requests.exceptions.RequestException as e:
         print(f"URL: {url} - Error: {e}")
         writer.writerow([url, "Error"])  # Write error to CSV file
@@ -49,7 +49,7 @@ def read_urls_from_file(file_name, output_file, use_proxy,path=""):
     try:
         with open(file_name, "r") as file, open(output_file, "w", newline="") as csvfile:
             writer = csv.writer(csvfile)
-            writer.writerow(["URL", "Status Code","Response Length","String Found"])  # Write header
+            writer.writerow(["String Found", "Status Code","URL", "Response Length",])  # Write header
             for line in file:
                 url = (line.strip() + path).strip()# Remove any whitespace
                 url = url + path
@@ -91,4 +91,4 @@ if __name__ == "__main__":
         read_urls_from_file(input_file, output_file, use_proxy)
         
     print(f"\n[i] Total row(s) processed: {row_processed}")
-    print(f"[i] Processing is complete!")
+    print(f" [i] Processing is complete!")
