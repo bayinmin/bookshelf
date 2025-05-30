@@ -60,39 +60,51 @@
   <!-- Output Full URLs without Parameters -->
   <p>Unique Full URL Count: <span id="fullURLCount">0</span></p>
   <textarea id="fullURLOutput" readonly placeholder="Full URLs without parameters will appear here"></textarea>
+  
+  <!-- Output Unique URI Paths Without Base URLs -->
+	<p>Unique URI Path Count: <span id="uriPathCount">0</span></p>
+	<textarea id="uriPathOutput" readonly placeholder="Unique URI paths will appear here"></textarea>
 
   <script>
-    function extractUrls() {
-      const urls = document.getElementById('urlInput').value.split(/\r?\n/);
-      const domains = new Set();
-      const urlsToFirstSlash = new Set();
-      const fullUrls = new Set();
 
-      urls.forEach(url => {
-        try {
-          const trimmedUrl = url.trim();
-          const domain = new URL(trimmedUrl).hostname;
-          domains.add(domain);
-          
-          const urlToFirstSlash = trimmedUrl.split('/').slice(0, 3).join('/');
-          urlsToFirstSlash.add(urlToFirstSlash);
+function extractUrls() {
+  const urls = document.getElementById('urlInput').value.split(/\r?\n/);
+  const domains = new Set();
+  const urlsToFirstSlash = new Set();
+  const fullUrls = new Set();
+  const uriPaths = new Set();
 
-          const fullUrl = trimmedUrl.split('?')[0]; // Remove query parameters
-          fullUrls.add(fullUrl);
-        } catch (error) {
-          console.warn(`Invalid URL: ${url}`);
-        }
-      });
+  urls.forEach(url => {
+    try {
+      const trimmedUrl = url.trim();
+      const domain = new URL(trimmedUrl).hostname;
+      domains.add(domain);
+      
+      const urlToFirstSlash = trimmedUrl.split('/').slice(0, 3).join('/');
+      urlsToFirstSlash.add(urlToFirstSlash);
 
-      document.getElementById('domainOutput').value = Array.from(domains).join('\n');
-      document.getElementById('domainCount').textContent = domains.size;
+      const fullUrl = trimmedUrl.split('?')[0]; // Remove query parameters
+      fullUrls.add(fullUrl);
 
-      document.getElementById('baseURLOutput').value = Array.from(urlsToFirstSlash).join('\n');
-      document.getElementById('baseURLCount').textContent = urlsToFirstSlash.size;
-
-      document.getElementById('fullURLOutput').value = Array.from(fullUrls).join('\n');
-      document.getElementById('fullURLCount').textContent = fullUrls.size;
+      const uriPath = new URL(trimmedUrl).pathname;
+      uriPaths.add(uriPath);
+    } catch (error) {
+      console.warn(`Invalid URL: ${url}`);
     }
+  });
+
+  document.getElementById('domainOutput').value = Array.from(domains).join('\n');
+  document.getElementById('domainCount').textContent = domains.size;
+
+  document.getElementById('baseURLOutput').value = Array.from(urlsToFirstSlash).join('\n');
+  document.getElementById('baseURLCount').textContent = urlsToFirstSlash.size;
+
+  document.getElementById('fullURLOutput').value = Array.from(fullUrls).join('\n');
+  document.getElementById('fullURLCount').textContent = fullUrls.size;
+
+  document.getElementById('uriPathOutput').value = Array.from(uriPaths).join('\n');
+  document.getElementById('uriPathCount').textContent = uriPaths.size;
+}
 
     function clearAll() {
       if (confirm('Are you sure you want to clear all fields?')) {
