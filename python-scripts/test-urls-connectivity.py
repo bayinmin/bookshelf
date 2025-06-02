@@ -52,7 +52,6 @@ def read_urls_from_file(file_name, output_file, use_proxy,path=""):
             writer.writerow(["String Found", "Status Code","URL", "Response Length",])  # Write header
             for line in file:
                 url = (line.strip() + path).strip()# Remove any whitespace
-                url = url + path
                 if url:  # Ensure the line is not empty
                     time.sleep(0.5)  # Pause for 0.5 seconds before each request
                     fetch_url(url, writer, use_proxy)
