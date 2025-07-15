@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>URL Filter</title>
+  <style>
+    body { font-family: Arial; padding: 20px; max-width: 600px; margin: auto; }
+    textarea { width: 100%; height: 120px; margin-bottom: 10px; }
+    label { margin-right: 10px; }
+    button { padding: 8px 16px; }
+  </style>
+</head>
+<body>
+
+  <h2>URL Cleaner</h2>
+  
+  <label for="inputUrls">Enter URLs (one per line):</label><br>
+  <textarea id="inputUrls" placeholder="http://example.com/file.js"></textarea>
+
+  <div>
+    <label><input type="checkbox" id="filterJs" checked>.js</label>
+    <label><input type="checkbox" id="filterPng" checked>.png</label>
+    <label><input type="checkbox" id="filterJpeg" checked>.jpeg</label>
+    <label><input type="checkbox" id="filterJpg" checked>.jpg</label>
+  </div>
+
+  <button onclick="filterUrls()">Filter URLs</button>
+
+  <h3>Filtered Output:</h3>
+  <textarea id="outputUrls" readonly></textarea>
+
+  <script>
+    function filterUrls() {
+      const input = document.getElementById("inputUrls").value.trim();
+      const urls = input.split(/\r?\n/);
+
+      const filters = [];
+      if (document.getElementById("filterJs").checked) filters.push(".js");
+      if (document.getElementById("filterPng").checked) filters.push(".png");
+      if (document.getElementById("filterJpeg").checked) filters.push(".jpeg");
+      if (document.getElementById("filterJpg").checked) filters.push(".jpg");
+
+      const filtered = urls.filter(url => {
+        return !filters.some(ext => url.trim().toLowerCase().endsWith(ext));
+      });
+
+      document.getElementById("outputUrls").value = filtered.join("\n");
+    }
+  </script>
+
+</body>
+</html>

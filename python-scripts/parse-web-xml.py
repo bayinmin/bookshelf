@@ -25,7 +25,7 @@ def extract_key_from_xml(file_path, key='url-pattern'):
             print(f"No elements found for tag: {key}")
         else:
             for elem in elements:
-                print(f"{key}: {elem.text.strip() if elem.text else '(empty)'}")
+                print(f"{elem.text.strip() if elem.text else '(empty)'}")
 
     except ET.ParseError as e:
         print(f"Failed to parse XML: {e}")
