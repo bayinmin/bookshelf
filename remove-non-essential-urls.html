@@ -73,6 +73,14 @@
       <input type="checkbox" id="filterCss" checked>
       .css
     </label>
+	<label class="checkbox-item">
+      <input type="checkbox" id="filterWoff2" checked>
+      .woff2
+    </label>
+	<label class="checkbox-item">
+      <input type="checkbox" id="filterSvg" checked>
+      .svg
+    </label>
   </div>
 
   <div class="button-group">
@@ -92,9 +100,11 @@
       if (document.getElementById("filterJs").checked) filters.push(".js");
       if (document.getElementById("filterPng").checked) filters.push(".png");
       if (document.getElementById("filterJpeg").checked) filters.push(".jpeg");
-      if (document.getElementById("filterJpg").").checked) filters.push(".jpg");
-	  if (document.getElementById("filterGif").").checked) filters.push(".gif");
-	  if (document.getElementById("filterCss").").checked) filters.push(".css");
+      if (document.getElementById("filterJpg").checked) filters.push(".jpg");
+	  if (document.getElementById("filterGif").checked) filters.push(".gif");
+	  if (document.getElementById("filterCss").checked) filters.push(".css");
+	  if (document.getElementById("filterWoff2").checked) filters.push(".woff2");
+	  if (document.getElementById("filterSvg").checked) filters.push(".svg");
 
       const filtered = urls.filter(url => {
         return !filters.some(ext => url.trim().toLowerCase().endsWith(ext));
@@ -109,7 +119,9 @@
       document.getElementById("filterJpeg").checked = false;
       document.getElementById("filterJpg").checked = false;
 	  document.getElementById("filterGif").checked = false;
-	  document.getElementById("filterCss").checked = false;
+	  document.getElementById("filterCss").checked = false;	  
+	  document.getElementById("filterWoff2").checked = false;	  
+	  document.getElementById("filterSvg").checked = false;
     }
   </script>
 
