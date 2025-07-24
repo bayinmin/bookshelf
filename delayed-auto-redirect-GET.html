@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Redirecting...</title>
+  <meta http-equiv="refresh" content="5; url=https://example.com">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding-top: 50px;
+    }
+    .countdown {
+      font-size: 2em;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <p>You will be redirected in <span class="countdown" id="timer">5</span> seconds.</p>
+  <p>If not redirected, <a href="https://example.com">click here</a>.</p>
+
+  <script>
+    let seconds = 5;
+    const timerEl = document.getElementById('timer');
+    const interval = setInterval(() => {
+      seconds--;
+      timerEl.textContent = seconds;
+      if (seconds <= 0) {
+        clearInterval(interval);
+      }
+    }, 1000);
+  </script>
+</body>
+</html>
