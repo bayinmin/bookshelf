@@ -70,6 +70,9 @@
     <button onclick="combineUrlsAndPaths()">Combine URLs and Paths</button>
 	<button onclick="removeDuplicates()">Remove Duplicate</button>
     <button class="warning-button" onclick="clearAllFields()">Clear All</button>
+	</br>
+	<button onclick="makeWsdlUrls()">Make WSDL URLs</button>
+	<button onclick="makeSwaggerUrls()">Make Swagger URL</button>
 
     <script>
         function openUrls() {
@@ -122,6 +125,60 @@
 			const uniqueUrls = [...new Set(urls)];  // Using Set to remove duplicates
 			document.getElementById('urlInput').value = uniqueUrls.join('\n');
 		}
+
+		function makeWsdlUrls() {
+			const urlInput = document.getElementById('urlInput').value;
+
+			const updated = urlInput
+				.split('\n')
+				.map(line => line.trim())
+				.filter(line => line.length > 0)
+				.map(line => {
+					if (line.toLowerCase().endsWith('?wsdl')) {
+						return line; // avoid double ?wsdl
+					}
+					return line + '?wsdl';
+				});
+
+			document.getElementById('urlInput').value = updated.join('\n');
+		}
+		
+		function makeSwaggerUrls() {
+			const urlInput = document.getElementById('urlInput').value;
+
+			const urls = urlInput
+				.split('\n')
+				.map(line => line.trim())
+				.filter(line => line.length > 0);
+
+			const swaggerPatterns = [
+				'/swagger',
+				'/swagger/index.html',
+				'/swagger-ui/index.html'
+			];
+
+			const output = [];
+
+			urls.forEach(base => {
+				swaggerPatterns.forEach(pattern => {
+					let combined;
+
+					// Avoid double slashes
+					if (base.endsWith('/') && pattern.startsWith('/')) {
+						combined = base.slice(0, -1) + pattern;
+					} else if (!base.endsWith('/') && !pattern.startsWith('/')) {
+						combined = base + '/' + pattern;
+					} else {
+						combined = base + pattern;
+					}
+
+					output.push(combined);
+				});
+			});
+
+			document.getElementById('urlInput').value = output.join('\n');
+		}
+
 
     </script>
 </body>
