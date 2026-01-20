@@ -1,0 +1,3 @@
+/swagger-ui/index.html
+/loggers
+/swagger.json
