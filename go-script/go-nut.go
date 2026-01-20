@@ -2,11 +2,13 @@ package main
 
 import (
 	"bufio"
+	"crypto/tls"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
 	"os"
+	"strings"
 )
 
 type UserCredential struct {
@@ -25,8 +27,8 @@ var InvalidCredential = UserCredential{
 }
 
 const (
-	DebugIsOn       = true
-	TestingModeIsOn = true
+	DebugIsOn       = false
+	TestingModeIsOn = false
 )
 
 var (
@@ -36,6 +38,11 @@ var (
 	FileURLsForTesting  = "test-urls.txt"
 	FilePaths           = "paths.txt"
 	FilePathsForTesting = "test-paths.txt"
+	xmlBody             = `
+		<dummy>
+			<entry>dummyvalue</entry>
+		</dummy>
+		`
 )
 
 func main() {
@@ -46,6 +53,9 @@ func main() {
 	client := &http.Client{
 		Transport: &http.Transport{
 			Proxy: http.ProxyURL(proxyUrl),
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true,
+			},
 		},
 	}
 
@@ -68,7 +78,11 @@ func main() {
 }
 
 func invokeRequest(client *http.Client, url string, userCredential *UserCredential) {
-	req, err := http.NewRequest("GET", url, nil)
+	//req, err := http.NewRequest("GET", url, nil)
+
+	req, err := http.NewRequest("POST", url, strings.NewReader(xmlBody))
+	req.Header.Set("Content-Type", "application/xml")
+
 	if userCredential != nil {
 		req.SetBasicAuth(userCredential.Username, userCredential.Password)
 	}
