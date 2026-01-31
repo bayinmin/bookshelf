@@ -2,7 +2,7 @@ package utils
 
 import (
 	"crypto/tls"
-	"gonut/config"
+	"gonuts/config"
 	"net/http"
 	"net/url"
 )

@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"gonut/config"
-	"gonut/utils"
+	"gonuts/config"
+	"gonuts/utils"
 
 	"io"
 	"net/http"

@@ -2,7 +2,7 @@ package utils
 
 import (
 	"context"
-	"gonut/config"
+	"gonuts/config"
 	"sync"
 
 	"golang.org/x/time/rate"

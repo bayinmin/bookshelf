@@ -1,4 +1,4 @@
-module gonut
+module gonuts
 
 go 1.25.6
 

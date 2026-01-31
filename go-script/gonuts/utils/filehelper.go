@@ -2,7 +2,7 @@ package utils
 
 import (
 	"bufio"
-	"gonut/config"
+	"gonuts/config"
 	"os"
 )
 
