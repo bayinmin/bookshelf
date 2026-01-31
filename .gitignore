@@ -1,3 +1,6 @@
 *.csv
 test*.txt
 web.xml
+*.csv
+test.go
+test*.yaml

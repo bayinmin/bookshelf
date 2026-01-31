@@ -1,0 +1,24 @@
+debug: true
+
+proxy_url: http://localhost:8080
+
+auth_valid:
+  username: FILL
+  password: FILL
+
+auth_invalid:
+  username: FILL
+  password: FILL
+
+body_xml: |
+  <dummy>
+    <entry>dummyvalue</entry>
+  </dummy>
+
+body_json: |
+  {
+    "entry": "jsonvalue"
+  }
+
+body_xform: |
+  keya=vala&keyb=valb
