@@ -1,7 +1,7 @@
 // config/constants.go
 package config
 
-const DebugIsOn = false
+const DebugIsOn = true
 
 var (
 	FileURLs               = "config/urls.txt"
@@ -76,6 +76,7 @@ type YamlConfig struct {
 	BodyJson       string         `yaml:"body_json"`
 	BodyxForm      string         `yaml:"body_xform"`
 	Debug          bool           `yaml:"debug"`
+	HTTPServerPort int            `yaml:"http_server_port"`
 }
 
 type FileRow struct {
