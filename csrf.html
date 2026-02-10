@@ -7,7 +7,9 @@
     body { font-family: sans-serif; max-width: 800px; margin: 20px auto; }
     label { display: block; margin: 8px 0 4px; }
     fieldset { margin: 10px 0; }
-    textarea { width: 100%; height: 260px; font-family: monospace; }
+    textarea { width: 100%; font-family: monospace; }
+    #bodyInput { height: 140px; }
+    #output { height: 260px; }
     button { margin: 8px 4px 8px 0; padding: 6px 12px; }
   </style>
 </head>
@@ -31,6 +33,9 @@
     <label><input type="radio" name="ctype" value="application/xml"> XML</label>
   </fieldset>
 
+  <label for="bodyInput">Request Body (JSON or XML)</label>
+  <textarea id="bodyInput" placeholder='{"example":"data"} or <root></root>'></textarea>
+
   <button id="generateBtn">Generate HTML</button>
 
   <h2>Generated HTML (copy or download)</h2>
@@ -41,6 +46,7 @@
 
   <script>
     const urlInput = document.getElementById('urlInput');
+    const bodyInput = document.getElementById('bodyInput');
     const generateBtn = document.getElementById('generateBtn');
     const output = document.getElementById('output');
     const copyBtn = document.getElementById('copyBtn');
@@ -51,20 +57,27 @@
       return el ? el.value : null;
     }
 
-    function buildFetchPage(url, method, contentType) {
+    function escapeBackticks(str) {
+      return str.replace(/`/g, "\\`");
+    }
+
+    function buildFetchPage(url, method, contentType, rawBody) {
       const isBodyMethod = ['POST', 'PUT', 'PATCH', 'DELETE'].includes(method);
-      const sampleBody =
-        contentType === 'application/json'
-          ? `JSON.stringify({ example: "data" })`
-          : '`<root><example>data</example></root>`';
 
-      const bodyComment = isBodyMethod
-        ? `// Edit the body as needed\n        body: ${sampleBody},\n`
-        : '';
+      let bodySection = "";
+      let headersSection = "";
 
-      const headers = isBodyMethod
-        ? `headers: {\n          "Content-Type": "${contentType}"\n        },\n`
-        : '';
+      if (isBodyMethod) {
+        headersSection = `headers: {
+          "Content-Type": "${contentType}"
+        },`;
+
+        if (contentType === "application/json") {
+          bodySection = `body: JSON.stringify(${rawBody}),`;
+        } else {
+          bodySection = `body: \`${escapeBackticks(rawBody)}\`,`;
+        }
+      }
 
       return `<!DOCTYPE html>
 <html lang="en">
@@ -93,7 +106,8 @@
 
       fetch("${url}", {
         method: "${method}",
-        ${headers}${bodyComment}
+        ${headersSection}
+        ${bodySection}
       })
         .then(async (res) => {
           const text = await res.text();
@@ -111,14 +125,16 @@
 
     generateBtn.addEventListener('click', () => {
       const url = urlInput.value.trim();
+      const rawBody = bodyInput.value.trim();
+      const method = getSelected('method');
+      const ctype = getSelected('ctype');
+
       if (!url) {
         alert('Please enter a URL.');
         return;
       }
-      const method = getSelected('method');
-      const ctype = getSelected('ctype');
 
-      const html = buildFetchPage(url, method, ctype);
+      const html = buildFetchPage(url, method, ctype, rawBody);
       output.value = html;
     });
 
@@ -147,6 +163,3 @@
   </script>
 </body>
 </html>
-```
-
-You can save this as, say, `fetch-generator.html`, open it in a browser, and start generating your fetch pages.
