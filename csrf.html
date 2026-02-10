@@ -33,6 +33,12 @@
     <label><input type="radio" name="ctype" value="application/xml"> XML</label>
   </fieldset>
 
+  <!-- NEW: credentials checkbox -->
+  <label>
+    <input type="checkbox" id="credInput" checked>
+    Send credentials (cookies)
+  </label>
+
   <label for="bodyInput">Request Body (JSON or XML)</label>
   <textarea id="bodyInput" placeholder='{"example":"data"} or <root></root>'></textarea>
 
@@ -47,6 +53,7 @@
   <script>
     const urlInput = document.getElementById('urlInput');
     const bodyInput = document.getElementById('bodyInput');
+    const credInput = document.getElementById('credInput');
     const generateBtn = document.getElementById('generateBtn');
     const output = document.getElementById('output');
     const copyBtn = document.getElementById('copyBtn');
@@ -61,11 +68,12 @@
       return str.replace(/`/g, "\\`");
     }
 
-    function buildFetchPage(url, method, contentType, rawBody) {
+    function buildFetchPage(url, method, contentType, rawBody, sendCreds) {
       const isBodyMethod = ['POST', 'PUT', 'PATCH', 'DELETE'].includes(method);
 
       let bodySection = "";
       let headersSection = "";
+      let credSection = sendCreds ? `credentials: "include",` : "";
 
       if (isBodyMethod) {
         headersSection = `headers: {
@@ -94,6 +102,7 @@
   <p>URL: <code>${url}</code></p>
   <p>Method: <code>${method}</code></p>
   <p>Content-Type: <code>${contentType}</code></p>
+  <p>Credentials: <code>${sendCreds ? "include" : "none"}</code></p>
 
   <button id="runBtn">Run Fetch</button>
   <h2>Response</h2>
@@ -106,6 +115,7 @@
 
       fetch("${url}", {
         method: "${method}",
+        ${credSection}
         ${headersSection}
         ${bodySection}
       })
@@ -128,13 +138,14 @@
       const rawBody = bodyInput.value.trim();
       const method = getSelected('method');
       const ctype = getSelected('ctype');
+      const sendCreds = credInput.checked;
 
       if (!url) {
         alert('Please enter a URL.');
         return;
       }
 
-      const html = buildFetchPage(url, method, ctype, rawBody);
+      const html = buildFetchPage(url, method, ctype, rawBody, sendCreds);
       output.value = html;
     });
 
