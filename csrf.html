@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Fetch HTML Generator</title>
+  <style>
+    body { font-family: sans-serif; max-width: 800px; margin: 20px auto; }
+    label { display: block; margin: 8px 0 4px; }
+    fieldset { margin: 10px 0; }
+    textarea { width: 100%; height: 260px; font-family: monospace; }
+    button { margin: 8px 4px 8px 0; padding: 6px 12px; }
+  </style>
+</head>
+<body>
+  <h1>Fetch() HTML Page Generator</h1>
+
+  <label for="urlInput">Request URL</label>
+  <input type="text" id="urlInput" style="width:100%;" placeholder="https://api.example.com/endpoint" />
+
+  <fieldset>
+    <legend>HTTP Method</legend>
+    <label><input type="radio" name="method" value="GET" checked> GET</label>
+    <label><input type="radio" name="method" value="POST"> POST</label>
+    <label><input type="radio" name="method" value="PUT"> PUT</label>
+    <label><input type="radio" name="method" value="DELETE"> DELETE</label>
+  </fieldset>
+
+  <fieldset>
+    <legend>Content-Type</legend>
+    <label><input type="radio" name="ctype" value="application/json" checked> JSON</label>
+    <label><input type="radio" name="ctype" value="application/xml"> XML</label>
+  </fieldset>
+
+  <button id="generateBtn">Generate HTML</button>
+
+  <h2>Generated HTML (copy or download)</h2>
+  <textarea id="output" readonly></textarea>
+  <br />
+  <button id="copyBtn">Copy to Clipboard</button>
+  <button id="downloadBtn">Download HTML</button>
+
+  <script>
+    const urlInput = document.getElementById('urlInput');
+    const generateBtn = document.getElementById('generateBtn');
+    const output = document.getElementById('output');
+    const copyBtn = document.getElementById('copyBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+
+    function getSelected(name) {
+      const el = document.querySelector(`input[name="${name}"]:checked`);
+      return el ? el.value : null;
+    }
+
+    function buildFetchPage(url, method, contentType) {
+      const isBodyMethod = ['POST', 'PUT', 'PATCH', 'DELETE'].includes(method);
+      const sampleBody =
+        contentType === 'application/json'
+          ? `JSON.stringify({ example: "data" })`
+          : '`<root><example>data</example></root>`';
+
+      const bodyComment = isBodyMethod
+        ? `// Edit the body as needed\n        body: ${sampleBody},\n`
+        : '';
+
+      const headers = isBodyMethod
+        ? `headers: {\n          "Content-Type": "${contentType}"\n        },\n`
+        : '';
+
+      return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Fetch Request Runner</title>
+  <style>
+    body { font-family: sans-serif; max-width: 800px; margin: 20px auto; }
+    pre { background: #f4f4f4; padding: 10px; overflow: auto; }
+  </style>
+</head>
+<body>
+  <h1>Fetch Request Runner</h1>
+  <p>URL: <code>${url}</code></p>
+  <p>Method: <code>${method}</code></p>
+  <p>Content-Type: <code>${contentType}</code></p>
+
+  <button id="runBtn">Run Fetch</button>
+  <h2>Response</h2>
+  <pre id="response"></pre>
+
+  <script>
+    document.getElementById('runBtn').addEventListener('click', () => {
+      const output = document.getElementById('response');
+      output.textContent = "Loading...";
+
+      fetch("${url}", {
+        method: "${method}",
+        ${headers}${bodyComment}
+      })
+        .then(async (res) => {
+          const text = await res.text();
+          output.textContent =
+            "Status: " + res.status + " " + res.statusText + "\\n\\n" + text;
+        })
+        .catch((err) => {
+          output.textContent = "Error: " + err;
+        });
+    });
+  <\/script>
+</body>
+</html>`;
+    }
+
+    generateBtn.addEventListener('click', () => {
+      const url = urlInput.value.trim();
+      if (!url) {
+        alert('Please enter a URL.');
+        return;
+      }
+      const method = getSelected('method');
+      const ctype = getSelected('ctype');
+
+      const html = buildFetchPage(url, method, ctype);
+      output.value = html;
+    });
+
+    copyBtn.addEventListener('click', async () => {
+      if (!output.value) return;
+      try {
+        await navigator.clipboard.writeText(output.value);
+        alert('Copied to clipboard.');
+      } catch {
+        alert('Copy failed. Select and copy manually.');
+      }
+    });
+
+    downloadBtn.addEventListener('click', () => {
+      if (!output.value) return;
+      const blob = new Blob([output.value], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'fetch_page.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+  </script>
+</body>
+</html>
+```
+
+You can save this as, say, `fetch-generator.html`, open it in a browser, and start generating your fetch pages.
