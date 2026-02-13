@@ -51,6 +51,15 @@ func GetPathFileName() (name string) {
 	return fileURLToOpen
 }
 
+func GetCookiesFileName() (name string) {
+	// cookies.txt vs test-cookies.txt
+	fileURLToOpen := config.FileCookies
+	if IsTestingModeOn() {
+		fileURLToOpen = config.FileCookiesForTesting
+	}
+	return fileURLToOpen
+}
+
 func InitHTTPClient(proxyUrl *url.URL) *http.Client {
 	// creating reusable HTTP client
 	return &http.Client{

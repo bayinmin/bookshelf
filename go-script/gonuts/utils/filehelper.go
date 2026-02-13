@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"gonuts/config"
 	"os"
+	"strings"
 )
 
 // load file and read concurrently
@@ -56,4 +57,13 @@ func LoadFileClassically(fname string) []config.FileRow {
 	}
 	return out
 
+}
+
+func LoadWholeFileAsString(fname string) string {
+	file, err := os.ReadFile(fname)
+	if err != nil {
+		Error("Error loading LoadWholeFileAsString!")
+		return ""
+	}
+	return strings.TrimSpace(string(file))
 }

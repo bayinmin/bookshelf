@@ -38,20 +38,17 @@ type MenuEntry struct {
 }
 
 var menus = []MenuEntry{
-	{Title: "(POST) > 🔒 | Basic Auth Fuzzing - URLs Only", Handler: fuzzBasicAuthPost},
-	{Title: "(GET)  > 🔒 | Basic Auth Fuzzing - URLs Only", Handler: fuzzBasicAuthGet},
-	{Title: "(GET)  > 🔓 | Dir Bust - URLs + Paths", Handler: DirBustURLAndPaths},
-	{Title: "(POST) > 🔓 | GraphQl fuzzing - URLs + Paths", Handler: fuzzGraphQL},
-	{Title: "Infra  > 🖥️ | Host HTTPS Server at 443", Handler: hostHTTPServer},
+	{Title: "(POST) > 🔒 	| Basic Auth Fuzzing - URLs Only", Handler: fuzzBasicAuthPost},
+	{Title: "(GET)  > 🔒 	| Basic Auth Fuzzing - URLs Only", Handler: fuzzBasicAuthGet},
+	{Title: "(GET)  > 🔓	| Dir Bust - URLs + Paths", Handler: DirBustURLAndPaths},
+	{Title: "(POST) > 🔓🔒 | GraphQl fuzzing - URLs + Paths", Handler: fuzzGraphQL},
+	{Title: "Infra  > 🖥️ 	 | Host HTTPS Server at 443", Handler: hostHTTPServer},
 }
 
 func main() {
 
 	IgniteTheEngine()
 	runCLIMenu()
-	// promptURLAndPathFiles()
-	// fuzzGraphQL()
-	// hostHTTPServer()
 }
 
 // This should be called first. This initialize all neccessary variables and configuration
@@ -168,10 +165,16 @@ func invokeHTTPGET(client *http.Client, url string, outputMode config.PrintOutpu
 	}
 }
 
-func invokeHTTPPOST(client *http.Client, url string, c config.ContentType, body io.Reader, outputMode config.PrintOutputMode) {
+func invokeHTTPPOST(client *http.Client, url string, c config.ContentType, body io.Reader, outputMode config.PrintOutputMode, cookies string) {
 
 	req, err := http.NewRequest(config.HTTPMethodPost.String(), url, body)
 	req.Header.Set("Content-Type", c.String())
+	if cookies != "" {
+		req.Header.Set("Cookie", cookies)
+	} else {
+		utils.Error("Cookies file " + utils.GetCookiesFileName() + " is empty!. This will be unauthenticated request without cookies.")
+	}
+
 	if err != nil {
 		fmt.Println(utils.RedText("[x] HTTP Client error!\n"), err)
 		return
@@ -319,6 +322,9 @@ func promptURLAndPathFiles() {
 
 func fuzzGraphQL() {
 
+	utils.Processing("Loading cookies from file...")
+	cookies := utils.LoadWholeFileAsString(utils.GetCookiesFileName())
+
 	utils.Processing("Loading URLs and Paths from files...")
 	urlFr := utils.LoadFileClassically(utils.GetUrlFileName())
 	pathFr := utils.LoadFileClassically(utils.GetPathFileName())
@@ -352,7 +358,7 @@ func fuzzGraphQL() {
 			reader := bytes.NewBuffer(jsonBytes)
 			jobs <- func() {
 				total++
-				invokeHTTPPOST(shareHTTPClient, url, config.ContentTypeJson, reader, config.PrintRespBody)
+				invokeHTTPPOST(shareHTTPClient, url, config.ContentTypeJson, reader, config.PrintRespBody, cookies)
 			}
 		}
 	}

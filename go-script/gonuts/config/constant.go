@@ -8,6 +8,8 @@ var (
 	FileURLsForTesting     = "config/test-urls.txt"
 	FilePaths              = "config/paths.txt"
 	FilePathsForTesting    = "config/test-paths.txt"
+	FileCookies            = "config/cookies.txt"
+	FileCookiesForTesting  = "config/test-cookies.txt"
 	YAMLFileName           = "config/config.yaml"
 	YAMLFileNameForTesting = "config/test-config.yaml"
 )
