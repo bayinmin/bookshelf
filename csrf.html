@@ -9,7 +9,12 @@
     fieldset { margin: 10px 0; }
     textarea { width: 100%; font-family: monospace; }
     #bodyInput { height: 140px; }
-    #output { height: 260px; }
+    #output { 
+			height: 250px; 
+			overflow: auto;
+			white-space: pre;
+			font-family: monospace;
+		}
     button { margin: 8px 4px 8px 0; padding: 6px 12px; }
   </style>
 </head>
@@ -94,7 +99,7 @@
   <title>Fetch Request Runner</title>
   <style>
     body { font-family: sans-serif; max-width: 800px; margin: 20px auto; }
-    pre { background: #f4f4f4; padding: 10px; overflow: auto; }
+    pre { background: #f4f4f4; padding: 10px; overflow: auto; height: 60vh;}
   </style>
 </head>
 <body>
@@ -165,7 +170,7 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'fetch_page.html';
+      a.download = 'cors.html';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);

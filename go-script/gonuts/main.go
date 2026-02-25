@@ -266,6 +266,7 @@ func fuzzBasicAuthPost() {
 }
 
 func DirBustURLAndPaths() {
+	utils.Processing("Initializing Multi-domain Directory Busting...")
 	utils.Processing("Loading URLs and Paths from files...")
 	urlFr := utils.LoadFileClassically(utils.GetUrlFileName())
 	pathFr := utils.LoadFileClassically(utils.GetPathFileName())
@@ -322,7 +323,8 @@ func promptURLAndPathFiles() {
 
 func fuzzGraphQL() {
 
-	utils.Processing("Loading cookies from file...")
+	utils.Processing("Initializing GraphQL Fuzzing module ...")
+	utils.Processing("Loading cookies from " + utils.GetCookiesFileName() + "...")
 	cookies := utils.LoadWholeFileAsString(utils.GetCookiesFileName())
 
 	utils.Processing("Loading URLs and Paths from files...")
@@ -358,7 +360,7 @@ func fuzzGraphQL() {
 			reader := bytes.NewBuffer(jsonBytes)
 			jobs <- func() {
 				total++
-				invokeHTTPPOST(shareHTTPClient, url, config.ContentTypeJson, reader, config.PrintRespBody, cookies)
+				invokeHTTPPOST(shareHTTPClient, url, config.ContentTypeJson, reader, config.PrintNone, cookies)
 			}
 		}
 	}
