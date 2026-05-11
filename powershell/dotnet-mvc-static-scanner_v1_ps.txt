@@ -1,0 +1,101 @@
+# ============================================
+# ASP.NET MVC Security Scanner
+# Console Output + CSV + JSON + Full Report
+# ============================================
+
+$patterns = @(
+    @{ Name = "Request Validation Disabled (XSS)"; Pattern = "ValidateInput\s*\(\s*false\s*\)|requestValidationMode\s*=\s*""2\.0""|validateRequest\s*=\s*""false""" },
+    @{ Name = "Missing Anti-Forgery Token (CSRF)"; Pattern = "
+
+\[HttpPost\]
+
+(?![\s\S]{0,80}
+
+\[ValidateAntiForgeryToken\]
+
+)" },
+    @{ Name = "Views Missing Anti-Forgery Token"; Pattern = "(?![\s\S]{0,200}AntiForgeryToken\(\))form" },
+    @{ Name = "Mass Assignment (Model Binding Abuse)"; Pattern = "public\s+ActionResult\s+\w+\s*\(\s*\w+\s+\w+\s*\)" },
+    @{ Name = "Dangerous Model Fields"; Pattern = "IsAdmin|Role|Balance|IsSuperUser" },
+    @{ Name = "Missing Bind Whitelist"; Pattern = "
+
+\[Bind\s*\(\s*Include\s*=" },
+    @{ Name = "Dangerous Output Encoding (XSS)"; Pattern = "Html\.Raw|MvcHtmlString\.Create|new\s+HtmlString" },
+    @{ Name = "Insecure Deserialization"; Pattern = "BinaryFormatter|JavaScriptSerializer|DataContractSerializer|XmlSerializer" },
+    @{ Name = "Weak Authorization"; Pattern = "AllowAnonymous|User\.IsInRole|Request
+
+\[""role""\]
+
+" },
+    @{ Name = "Raw SQL (SQL Injection)"; Pattern = "SqlQuery\s*\(|ExecuteSqlCommand\s*\(|""\s*\+\s*\w+" },
+    @{ Name = "Insecure File Uploads"; Pattern = "HttpPostedFileBase|SaveAs\s*\(" },
+    @{ Name = "Debug/Custom Errors Disabled"; Pattern = "<customErrors\s+mode=""Off""|<compilation\s+debug=""true""" },
+    @{ Name = "Weak Cookie Flags"; Pattern = "httpOnlyCookies\s*=\s*""false""|requireSSL\s*=\s*""false""" }
+)
+
+$findings = @()
+
+Write-Host "=== ASP.NET MVC Security Scan Started ===`n"
+
+foreach ($p in $patterns) {
+    Write-Host ">>> Checking: $($p.Name)" -ForegroundColor Cyan
+
+    $results = Get-ChildItem -Recurse -Include *.cs, *.cshtml, *.config |
+               Select-String -Pattern $p.Pattern -CaseSensitive:$false -SimpleMatch:$false
+
+    if ($results) {
+        foreach ($r in $results) {
+            $line = $r.Line.Trim()
+            Write-Host ("[+] {0}:{1}  -->  {2}" -f $r.Path, $r.LineNumber, $line) -ForegroundColor Yellow
+
+            $findings += [PSCustomObject]@{
+                Category   = $p.Name
+                File       = $r.Path
+                LineNumber = $r.LineNumber
+                Line       = $line
+            }
+        }
+    } else {
+        Write-Host "[-] No findings" -ForegroundColor DarkGray
+    }
+
+    Write-Host ""
+}
+
+Write-Host "=== Scan Complete ===`n"
+
+# ============================
+# Export CSV
+# ============================
+$csvPath = "mvc_security_findings.csv"
+$findings | Export-Csv -Path $csvPath -NoTypeInformation -Encoding UTF8
+Write-Host "CSV report written to: $csvPath" -ForegroundColor Green
+
+# ============================
+# Export JSON
+# ============================
+$jsonPath = "mvc_security_findings.json"
+$findings | ConvertTo-Json -Depth 5 | Out-File $jsonPath -Encoding UTF8
+Write-Host "JSON report written to: $jsonPath" -ForegroundColor Green
+
+# ============================
+# Full Audit Report (Text)
+# ============================
+$reportPath = "mvc_security_audit_report.txt"
+
+"=== ASP.NET MVC Security Audit Report ===`n" | Out-File $reportPath
+
+$grouped = $findings | Group-Object Category
+
+foreach ($group in $grouped) {
+    Add-Content $reportPath "## $($group.Name)"
+    Add-Content $reportPath "----------------------------------------"
+
+    foreach ($item in $group.Group) {
+        Add-Content $reportPath ("{0}:{1}  -->  {2}" -f $item.File, $item.LineNumber, $item.Line)
+    }
+
+    Add-Content $reportPath "`n"
+}
+
+Write-Host "Full audit report written to: $reportPath" -ForegroundColor Green
